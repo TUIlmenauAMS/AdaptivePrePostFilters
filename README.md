@@ -1,5 +1,5 @@
 # Adaptive Pre- and Post- Filters
-Adaptive Pre and Post Filters based on Perceptual Audio Coding Using Adaptive Preand Post-Filters and Lossless Compression by G. Schuller
+Adaptive Pre and Post Filters based on Perceptual Audio Coding Using Adaptive Pre- and Post-Filters and Lossless Compression by G. Schuller
 
 [Perceptual audio coding using adaptive pre-and post-filters and lossless compression](https://www.idmt.fraunhofer.de/content/dam/idmt/en/documents/Personal%20Websites/Schuller/publications/tsap9-02.pdf)
 <br>GDT Schuller, B Yu, D Huang, B Edler
@@ -16,7 +16,7 @@ IEEE Transactions on Speech and Audio Processing 10 (6), 379-390
 * Reflexion coefficients are derived from ACF using Levinson-Durbin Recursion
 
 #### Usage 
-filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff=adaptive_prefilter_quant(N,P,olap,q)<br>
+filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff, rate=adaptive_prefilter_quant(N,P,olap,q)<br>
 The filtered signal is written to the wavfile filt_quantized.wav<br>
 
 Arguments:
@@ -36,11 +36,12 @@ olap = extend of interpolation used<br>
 filtered_spectrum = DFT Spectrum of the filtered signal<br>
 input_spectrum = DFT Spectrum of the input signal<br>
 norm_coeff = normalized coefficients
+rate = sampling rate of the audio output
 
 
 ### post_filter.py
 
-Reconstruct signal back from pre-filtered signal 
+Reconstruct signal back from pre-filtered signal. 
 
 #### Usage
 reconst = post_filter(fil_coef,filtered,olap,fs,norm_coeff)
@@ -60,8 +61,9 @@ The reconstructed signal is returned in reconst.
 Reconstructed signal is written to reconstructed.wav
 
 ### FilterTest-Interact.ipynb
+### FilterApplication-Interact.ipynb
 
-An interactive jupyter notebook to test and demonstrate the pre- and post- filters.
+Interactive jupyter notebooks to test and demonstrate the pre- and post- filters.
 
 In case you run into problems running jupyter widgets try:
 
