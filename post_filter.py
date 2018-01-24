@@ -18,13 +18,10 @@ def post_filter(fil_coef,filtered,olap,fs, norm_coeff):
 	import scipy.io.wavfile
 	from scipy import signal as signal
 	import levinson_durbin
-	levinson_durbin
 	from levinson_durbin import levinson_durbin
 	import psycho_acoustic_model
-	psycho_acoustic_model
 	from psycho_acoustic_model import psycho
 	import inputFile 
-	inputFile
 	from inputFile import fileDialog
 	import matplotlib.pyplot as plt
 	

@@ -13,7 +13,7 @@ def adaptive_prefilter_quant(N,P,olap,q):
 # Reflexion coefficients are derived from ACF using Levinson-Durbin Recursion
 # N = Frame Size, P = Filter Order, olap = Interpolation Depth , q = quantization
 # Returns filt_lattice=filter coefficients (ki),filter_output=filtered signal,olap = extend of interpolation used 
-# filtered_spectrum = DFT Spectrum of the filtered signal ,input_spectrum = DFT Spectrum of the input signal
+# filtered_spectrum = DFT Spectrum of the filtered signal ,input_spectrum = DFT Spectrum of the input signal, rate=sampling rate
 # filtered signal is written to the wavfile filt_quantized.wav
 # Currentky supports 16000 Hz sampling rate only
 
@@ -22,13 +22,10 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	import scipy.io.wavfile
 	from scipy import signal as signal
 	import levinson_durbin
-	levinson_durbin
 	from levinson_durbin import levinson_durbin
 	import psycho_acoustic_model
-	psycho_acoustic_model
 	from psycho_acoustic_model import psycho
 	import inputFile 
-	inputFile
 	from inputFile import fileDialog
 	import matplotlib.pyplot as plt
 	
@@ -82,7 +79,10 @@ def adaptive_prefilter_quant(N,P,olap,q):
 		output[0:input_length]=X[0,:]
 		return output,tmp_state
 	
-	x=np.fromfile(open(fileDialog()),np.int16)[24:]
+	
+	filename=fileDialog()
+	rate, x = scipy.io.wavfile.read(filename)
+	#x=np.fromfile(open(filename),np.int16)[24:]
 	blks=x.size/N
 	num_blocks=np.floor(blks).astype(int)
 	z=x[0:num_blocks*N]
@@ -94,7 +94,7 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	print filt_lattice.shape
 	state = np.zeros((P)).astype(float)
 	state=b_prev=np.zeros(P).astype(float)
-	rxx=psycho(z[0:N],16000,N)
+	rxx=psycho(z[0:N],rate,N)
 	reflex_coef_current,cnt=levinson_durbin(rxx,P)
 	reflex_coef_old = reflex_coef_current
 	filt_lattice[:,0]=reflex_coef_current
@@ -104,7 +104,7 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	norm_coeff=np.zeros(num_blocks).astype(float)
 	for n in range(num_blocks):
 		if n<num_blocks-1:
-			rxx=psycho(z[(n+1)*N:(n+2)*N],16000,N)
+			rxx=psycho(z[(n+1)*N:(n+2)*N],rate,N)
 			reflex_coef_next,count=levinson_durbin(rxx,P)
 			filt_lattice[:,n+1]=reflex_coef_next
 		tmp_latticefiltered,tmp_state=lattice_firfilter(z[n*N:n*N+N],reflex_coef_current,reflex_coef_old,reflex_coef_next,olap,state)
@@ -128,5 +128,5 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	filter_output=q*filter_output
 	towav=np.int16(towav)	
 	print avg_bits
-	scipy.io.wavfile.write('filt_quantized.wav',16000,q*towav)
-	return filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff
+	scipy.io.wavfile.write('filt_quantized.wav',rate,q*towav)
+	return filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff, rate
