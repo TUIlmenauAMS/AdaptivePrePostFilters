@@ -65,6 +65,8 @@ Reconstructed signal is written to reconstructed.wav
 
 Interactive jupyter notebooks to test and demonstrate the pre- and post- filters.
 
+You can visit this notebook at: [Filter Application Example](https://nbviewer.jupyter.org/github/TUIlmenauAMS/AdaptivePrePostFilters/blob/master/FilterApplication-Interact.ipynb)
+
 In case you run into problems running jupyter widgets try:
 
 pip install ipywidgets <br>
