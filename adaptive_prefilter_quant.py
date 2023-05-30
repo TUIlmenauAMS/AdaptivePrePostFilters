@@ -91,7 +91,7 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	residue=np.zeros(0).astype(float)
 	reconst=np.zeros(0).astype(float)
 	filt_lattice=np.zeros((P,blks)).astype(float)
-	print filt_lattice.shape
+	print( filt_lattice.shape)
 	state = np.zeros((P)).astype(float)
 	state=b_prev=np.zeros(P).astype(float)
 	rxx=psycho(z[0:N],rate,N)
@@ -127,6 +127,6 @@ def adaptive_prefilter_quant(N,P,olap,q):
 	avg_bits=1+sum(np.log2(np.array(np.abs(towav[towav!=0]))))/towav.size
 	filter_output=q*filter_output
 	towav=np.int16(towav)	
-	print avg_bits
+	print(avg_bits)
 	scipy.io.wavfile.write('filt_quantized.wav',rate,q*towav)
 	return filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff, rate
