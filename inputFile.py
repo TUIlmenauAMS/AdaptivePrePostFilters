@@ -1,5 +1,6 @@
 import tkinter as tk
-import tkFileDialog as filedialog
+#import tkFileDialog as filedialog
+from tkinter import filedialog
 
 def fileDialog():
     root = tk.Tk()
