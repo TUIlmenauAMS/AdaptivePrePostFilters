@@ -1,4 +1,4 @@
-import Tkinter as tk
+import tkinter as tk
 import tkFileDialog as filedialog
 
 def fileDialog():
