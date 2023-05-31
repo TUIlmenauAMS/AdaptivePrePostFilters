@@ -72,7 +72,7 @@ class PsychoacousticModel:
         #upper slope, fbdB attenuation per Bark, over maxbark Bark (full frequency range), with fadB dB simultaneous masking:
         spreadingfunctionBarkdB[0:self.nfilts]=np.linspace(-maxbark*self._fbdb,-2.5,self.nfilts)-self._fadB
         #lower slope fbbdb attenuation per Bark, over maxbark Bark (full frequency range):
-          spreadingfunctionBarkdB[self.nfilts:2*self.nfilts]=np.linspace(0,-maxbark*self._fbbdb,self.nfilts)-self._fadB
+        spreadingfunctionBarkdB[self.nfilts:2*self.nfilts]=np.linspace(0,-maxbark*self._fbbdb,self.nfilts)-self._fadB
         #print "spreadingfunctionBarkdB=", spreadingfunctionBarkdB
         #Convert from dB to "voltage" and include alpha exponent
         spreadingfunctionBarkVoltage=10.0**(spreadingfunctionBarkdB/20.0*self._alpha)
@@ -82,7 +82,7 @@ class PsychoacousticModel:
         
         for k in range(self.nfilts):
            spreadingfuncmatrix[:,k]=spreadingfunctionBarkVoltage[(self.nfilts-k):(2*self.nfilts-k)]
-        #print "spreadingfuncmatrix= ",spreadingfuncmatrix
+           #print "spreadingfuncmatrix= ",spreadingfuncmatrix
         return spreadingfuncmatrix
 
     def mX2Bark(self, type):
