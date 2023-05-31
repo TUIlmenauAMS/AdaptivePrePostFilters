@@ -170,11 +170,11 @@ class PsychoacousticModel:
           f=min_bark + (i)*step_barks #from call: 0+(i)*24.0/63
           if f<4000.0:
              f=self.bark2hz(min_bark + (i+1)*step_barks )
-            #declining slope, minimum ist at boundary of next Bark domain subband:
-            self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
+             #declining slope, minimum ist at boundary of next Bark domain subband:
+             self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
           else:
-            #increasing slobe, lower Bark domain boundary is minimum:
-            self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
+             #increasing slobe, lower Bark domain boundary is minimum:
+             self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
           #LTQ=np.clip((3.64*(f/1000.)**-0.8 -6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)),-20,60)          
 
           """
