@@ -33,7 +33,7 @@ def levinson_durbin(r,P):
 				ktp=0.0
 				if np.abs(k[i])>1:
 					k[i]=0
-	                                count+=1
+					count+=1
 				for l in range(1,i):
 					a_tmp[l]=a[l]+k[i]*a[i-l]
 				a=a_tmp
