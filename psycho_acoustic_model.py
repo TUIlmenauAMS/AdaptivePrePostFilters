@@ -53,7 +53,7 @@ class PsychoacousticModel:
         self._maxb = 1./self.nfilts                             # Bark-band normalization
         #self._fa = 1./(10 ** (14.5/20.) * 10 ** (12./20.))      # Simultaneous masking for tones at Bark band 12
         self._fadB= 14.5+12
-        self._fa = 1./(10 ** ((self._fadB)/20.))			# shorter...
+        self._fa = 1./(10 ** ((self._fadB)/20.))                        # shorter...
         self._fbdb=7.5
         self._fb = 1./(10**(self._fbdb/20.))                           # Upper slope of spreading function
         self._fbbdb=26.0
@@ -64,24 +64,24 @@ class PsychoacousticModel:
         self.spreadingfuncmatrix=self.spreadingfunctionmat(self.max_freq)
 
     def spreadingfunctionmat(self,maxfreq):
-	#computes a matrix with shifted spreading functions in each column, in the Bark scale.
-	#including the alpha exponent for non-linear superposition
-	maxbark=self.hz2bark(maxfreq)
+        #computes a matrix with shifted spreading functions in each column, in the Bark scale.
+        #including the alpha exponent for non-linear superposition
+        maxbark=self.hz2bark(maxfreq)
         spreadingfunctionBarkdB=np.zeros(2*self.nfilts)
-	
-	#upper slope, fbdB attenuation per Bark, over maxbark Bark (full frequency range), with fadB dB simultaneous masking:
-	spreadingfunctionBarkdB[0:self.nfilts]=np.linspace(-maxbark*self._fbdb,-2.5,self.nfilts)-self._fadB
-	#lower slope fbbdb attenuation per Bark, over maxbark Bark (full frequency range):
-  	spreadingfunctionBarkdB[self.nfilts:2*self.nfilts]=np.linspace(0,-maxbark*self._fbbdb,self.nfilts)-self._fadB
-	#print "spreadingfunctionBarkdB=", spreadingfunctionBarkdB
-	#Convert from dB to "voltage" and include alpha exponent
-	spreadingfunctionBarkVoltage=10.0**(spreadingfunctionBarkdB/20.0*self._alpha)
-	#print "spreadingfunctionBarkVoltage=", spreadingfunctionBarkVoltage
-	#Spreading functions for all bark scale bands in a matrix:
-	spreadingfuncmatrix=np.zeros((self.nfilts,self.nfilts))
-	
-	for k in range(self.nfilts):
-	   spreadingfuncmatrix[:,k]=spreadingfunctionBarkVoltage[(self.nfilts-k):(2*self.nfilts-k)]
+        
+        #upper slope, fbdB attenuation per Bark, over maxbark Bark (full frequency range), with fadB dB simultaneous masking:
+        spreadingfunctionBarkdB[0:self.nfilts]=np.linspace(-maxbark*self._fbdb,-2.5,self.nfilts)-self._fadB
+        #lower slope fbbdb attenuation per Bark, over maxbark Bark (full frequency range):
+          spreadingfunctionBarkdB[self.nfilts:2*self.nfilts]=np.linspace(0,-maxbark*self._fbbdb,self.nfilts)-self._fadB
+        #print "spreadingfunctionBarkdB=", spreadingfunctionBarkdB
+        #Convert from dB to "voltage" and include alpha exponent
+        spreadingfunctionBarkVoltage=10.0**(spreadingfunctionBarkdB/20.0*self._alpha)
+        #print "spreadingfunctionBarkVoltage=", spreadingfunctionBarkVoltage
+        #Spreading functions for all bark scale bands in a matrix:
+        spreadingfuncmatrix=np.zeros((self.nfilts,self.nfilts))
+        
+        for k in range(self.nfilts):
+           spreadingfuncmatrix[:,k]=spreadingfunctionBarkVoltage[(self.nfilts-k):(2*self.nfilts-k)]
         #print "spreadingfuncmatrix= ",spreadingfuncmatrix
         return spreadingfuncmatrix
 
@@ -144,14 +144,14 @@ class PsychoacousticModel:
 
         min_bark = self.hz2bark(minfreq)  #default: 0.0
         nyqbark = self.hz2bark(maxfreq) - min_bark #Bark range, for instance 24
-	#print "nyqbark= ", nyqbark
+        #print "nyqbark= ", nyqbark
 
         if (nfilts == 0):
           nfilts = np.ceil(nyqbark)+1
-	#from call: nfilts=64
+        #from call: nfilts=64
 
         W = np.zeros((nfilts, nfft))
-	#from call: 64x2048
+        #from call: 64x2048
 
         # Bark per bark-scale band
         step_barks = nyqbark/(nfilts-1) #from call: 24.0/63
@@ -159,41 +159,41 @@ class PsychoacousticModel:
         # Frequency of each FFT bin in Bark, in 1025 frequency bands (from call)
         binbarks = self.hz2bark(np.linspace(0,(nfft/2),(nfft/2)+1)*fs/nfft)
 
-	f_bark_mid=np.zeros(nfilts)
+        f_bark_mid=np.zeros(nfilts)
 
         for i in xrange(nfilts):
           
           f_bark_mid[i] = min_bark + (i)*step_barks #from call: 0+(i)*24.0/63
 
           # Compute the absolute threshold from Hz to dB:
-	  #f=self.bark2hz(f_bark_mid[i] )
-	  f=min_bark + (i)*step_barks #from call: 0+(i)*24.0/63
-	  if f<4000.0:
- 	    f=self.bark2hz(min_bark + (i+1)*step_barks )
-	    #declining slope, minimum ist at boundary of next Bark domain subband:
+          #f=self.bark2hz(f_bark_mid[i] )
+          f=min_bark + (i)*step_barks #from call: 0+(i)*24.0/63
+          if f<4000.0:
+             f=self.bark2hz(min_bark + (i+1)*step_barks )
+            #declining slope, minimum ist at boundary of next Bark domain subband:
             self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
-	  else:
-	    #increasing slobe, lower Bark domain boundary is minimum:
+          else:
+            #increasing slobe, lower Bark domain boundary is minimum:
             self._LTeq[i] = min((3.64*(f/1000.)**-0.8-6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)), 60)
           #LTQ=np.clip((3.64*(f/1000.)**-0.8 -6.5*np.exp(-0.6*(f/1000.-3.3)**2.)+1e-3*((f/1000.)**4.)),-20,60)          
 
           """
           # Linear slopes in log-space (i.e. dB) intersect to trapezoidal window
           lof = np.add(binbarks, (-1*f_bark_mid - 0.5))
-	  #print "lof= ", lof
+          #print "lof= ", lof
           hif = np.add(binbarks, (-1*f_bark_mid + 0.5))
-	  #print "hif=", hif
-	  #lower half of FFT spectrum is assigned, looks like spreading functions already applied:
+          #print "hif=", hif
+          #lower half of FFT spectrum is assigned, looks like spreading functions already applied:
           #W[i,0:(nfft/2)+1] = 10**(np.minimum(0, np.minimum(np.divide(hif,width), np.multiply(lof,-2.5/width))))
           """
-	  W[i,0:(nfft/2)+1] = (np.round(binbarks/step_barks)== i)
-	#print "self.bark2hz(f_bark_mid)= ", self.bark2hz(f_bark_mid)
-	#plt.figure()
-	#plt.plot(self.bark2hz(f_bark_mid), self._LTeq)
-	#plt.title('Masking Threshold in Quiet')
-   	#plt.show()
-	#print "W.shape= ", W.shape
-	#print "W= ", W
+          W[i,0:(nfft/2)+1] = (np.round(binbarks/step_barks)== i)
+        #print "self.bark2hz(f_bark_mid)= ", self.bark2hz(f_bark_mid)
+        #plt.figure()
+        #plt.plot(self.bark2hz(f_bark_mid), self._LTeq)
+        #plt.title('Masking Threshold in Quiet')
+           #plt.show()
+        #print "W.shape= ", W.shape
+        #print "W= ", W
         #print "self._LTeq", self._LTeq
 
         return W
@@ -204,23 +204,23 @@ class PsychoacousticModel:
             W    : (ndarray)    The inverse transformation matrix.
         """
         # Fix up the weight matrix by transposing and "normalizing"
-	"""
+        """
         W_short = self.W[:,0:self.nfreqs + 1]
         WW = np.dot(W_short.T,W_short)
 
         WW_mean_diag = np.maximum(np.mean(np.diag(WW)), sum(WW,1))
-	print "WW_mean_diag=", WW_mean_diag
+        print "WW_mean_diag=", WW_mean_diag
         WW_mean_diag = np.reshape(WW_mean_diag,(WW_mean_diag.shape[0],1))
         W_inv_denom = np.tile(WW_mean_diag,(1,self.nfilts))
 
         W_inv = np.divide(W_short.T, W_inv_denom)
-	
-	"""
+        
+        """
 
-	W_inv= np.dot(np.diag((1.0/(np.sum(self.W,1)+1e-6))**0.5), self.W[:,0:self.nfreqs + 1]).T
+        W_inv= np.dot(np.diag((1.0/(np.sum(self.W,1)+1e-6))**0.5), self.W[:,0:self.nfreqs + 1]).T
      
-	#print "W_inv.shape=", W_inv.shape
-	#print "W_inv=", W_inv
+        #print "W_inv.shape=", W_inv.shape
+        #print "W_inv=", W_inv
 
         return W_inv
 
@@ -454,12 +454,12 @@ class PsychoacousticModel:
             mX       : (ndarray)    2D Array containing the magnitude spectra (1 time frame x frequency subbands)
         Returns      :
             mT       : (ndarray)    2D Array containing the masking threshold.
-	Set alpha in __init__ for suitable exponents for non-linear superposition!
+        Set alpha in __init__ for suitable exponents for non-linear superposition!
         Authors      : Gerald Schuller('shl'), S.I. Mimilakis ('mis')
         """
         # Bark Scaling with the initialized, from the class, matrix W.
         if mX.shape[1] % 2 == 0:
-  	    #print "mX.shape even"
+              #print "mX.shape even"
             nyq = False
             mX = (np.dot( np.abs(mX)**2.0, self.W[:, :self.nfreqs].T))**(0.5)
         else :
@@ -475,7 +475,7 @@ class PsychoacousticModel:
         fc= maxbark/Numsubbands
        
 
-	#self._fa = 1./(10 ** ((14.5+12)/20.))			# simultaneous masking, 26.5dB
+        #self._fa = 1./(10 ** ((14.5+12)/20.))                        # simultaneous masking, 26.5dB
         #self._fb = 1./(10**(7.5/20.))                           # Upper slope of spreading function, 7.5dB/Bark
         #self._fbb = 1./(10**(26./20.))                          # Lower slope of spreading function, 26dB/bark
         #self._fd = 1./self._alpha  
@@ -483,23 +483,23 @@ class PsychoacousticModel:
         maskingThreshold = np.zeros((timeFrames, Numsubbands))
 
         
-	"""
-	spreadingfunctionBarkdB=np.zeros(2*Numsubbands)
-	#Lower slope in dB: 26 dB attenuation per Bark, over 24 Bark (full frequency range), with 26.5 dB simultaneous masking:
-	spreadingfunctionBarkdB[0:Numsubbands]=np.linspace(-24*26,0,Numsubbands)-26.5
-	#upper slope in dB: 7.5 dB attenuation per Bark, over 24 Bark (full frequency range):
-  	spreadingfunctionBarkdB[Numsubbands,2*Numsubbands]=np.linspace(0,-24*7.5,Numsubbands)-26.5
-	spreadingfunctionBarkVoltage=10.0**(spreadingfunctionBarkdB/20.0)
-	#Spreading functions for all bark scale bands in a matrix:
-	self.spreadingfuncmatrix=np.zeros((Numsubbands,Numsubbands))
-	for k in range(Numsubbands):
-	   self.spreadingfuncmatrix[k,:]=spreadingfunctionBarkVoltage[(Numsubbands-k):(2*Numsubbands-k))]
-	"""
+        """
+        spreadingfunctionBarkdB=np.zeros(2*Numsubbands)
+        #Lower slope in dB: 26 dB attenuation per Bark, over 24 Bark (full frequency range), with 26.5 dB simultaneous masking:
+        spreadingfunctionBarkdB[0:Numsubbands]=np.linspace(-24*26,0,Numsubbands)-26.5
+        #upper slope in dB: 7.5 dB attenuation per Bark, over 24 Bark (full frequency range):
+          spreadingfunctionBarkdB[Numsubbands,2*Numsubbands]=np.linspace(0,-24*7.5,Numsubbands)-26.5
+        spreadingfunctionBarkVoltage=10.0**(spreadingfunctionBarkdB/20.0)
+        #Spreading functions for all bark scale bands in a matrix:
+        self.spreadingfuncmatrix=np.zeros((Numsubbands,Numsubbands))
+        for k in range(Numsubbands):
+           self.spreadingfuncmatrix[k,:]=spreadingfunctionBarkVoltage[(Numsubbands-k):(2*Numsubbands-k))]
+        """
         #print "spreadingfuncmatrix= ", self.spreadingfuncmatrix
 
         for frameindx in xrange(mX.shape[0]) :
 
-	    """
+            """
             mT = np.zeros((Numsubbands))
             for n in xrange(Numsubbands):
                 for m in xrange(0, n):
@@ -513,18 +513,18 @@ class PsychoacousticModel:
                        #print "factors loops for band 0: ", (self._fa * (self._fbb ** ((m - n) * fc))) ** self._alpha
 
                 mT[n] = mT[n] ** (self._fd)
-	    #print "mX[frameindx, 0] ", mX[frameindx, 0]
+            #print "mX[frameindx, 0] ", mX[frameindx, 0]
             #print "mT for loops: ", mT[0]
            #"""
 
-	    #Application of spreading function, including exponent alpha, using matrix multiplication:
+            #Application of spreading function, including exponent alpha, using matrix multiplication:
             #"""
             mT=np.dot(mX[frameindx, :]**self._alpha, self.spreadingfuncmatrix)
             #print "factors matrix, band0: ", self.spreadingfuncmatrix[:,0]
-	    #apply the inverse exponent to the result:
-	    mT=mT**(1.0/self._alpha)
+            #apply the inverse exponent to the result:
+            mT=mT**(1.0/self._alpha)
             #print "mX[frameindx, 0] ", mX[frameindx, 0]
-	    #print "mT matrix mult: ", mT[0]
+            #print "mT matrix mult: ", mT[0]
             #"""
             #Adding masking threshold in quiet:
             #print "mT.shape=", mT.shape, "self._LTeq.shape", mT +( 10.0**((self._LTeq-20)/20))
