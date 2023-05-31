@@ -14,7 +14,7 @@ import numpy as np
 #from scipy.fftpack import fft, ifft
 from numpy.fft import fft, ifft
 import matplotlib.pyplot as plt
-import pyaudio
+#import pyaudio
 import wave
 import time
 
