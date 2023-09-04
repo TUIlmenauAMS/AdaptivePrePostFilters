@@ -93,7 +93,7 @@ def adaptive_prefilter_quant(N,P,olap,q, filename):
    filt_output=np.zeros(0).astype(float)
    residue=np.zeros(0).astype(float)
    reconst=np.zeros(0).astype(float)
-   filt_lattice=np.zeros((P,blks)).astype(float)
+   filt_lattice=np.zeros((int(P),int(blks))).astype(float)
    print(filt_lattice.shape)
    state = np.zeros((P)).astype(float)
    state=b_prev=np.zeros(P).astype(float)
