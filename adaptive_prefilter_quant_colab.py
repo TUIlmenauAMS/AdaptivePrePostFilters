@@ -85,26 +85,30 @@ def adaptive_prefilter_quant(N,P,olap,q, filename):
    
    #filename=fileDialog()
    rate, x = scipy.io.wavfile.read(filename)
+   print("x.shape=", x.shape)
+   if len(x.shape)!=1:
+     print("Make it mono")
+     x=x[:,0]
    #x=np.fromfile(open(filename),np.int16)[24:]
    blks=x.size//N
    num_blocks=np.floor(blks).astype(int)
    z=x[0:num_blocks*N]
-   fil_coef=np.zeros(0).astype(float)
-   filt_output=np.zeros(0).astype(float)
-   residue=np.zeros(0).astype(float)
-   reconst=np.zeros(0).astype(float)
-   filt_lattice=np.zeros((int(P),int(blks))).astype(float)
+   fil_coef=np.zeros(0)
+   filt_output=np.zeros(0)
+   residue=np.zeros(0)
+   reconst=np.zeros(0)
+   filt_lattice=np.zeros((int(P),int(blks)))
    print(filt_lattice.shape)
-   state = np.zeros((P)).astype(float)
-   state=b_prev=np.zeros(P).astype(float)
+   state = np.zeros((P))
+   state=b_prev=np.zeros(P)
    rxx=psycho(z[0:N],rate,N)
    reflex_coef_current,cnt=levinson_durbin(rxx,P)
    reflex_coef_old = reflex_coef_current
    filt_lattice[:,0]=reflex_coef_current
-   filter_output=np.zeros((N,num_blocks)).astype(float)
+   filter_output=np.zeros((N,num_blocks))
    filtered_spectrum=np.zeros((N,num_blocks)).astype(complex)
    input_spectrum=np.zeros((N,num_blocks)).astype(complex)
-   norm_coeff=np.zeros(num_blocks).astype(float)
+   norm_coeff=np.zeros(num_blocks)
    for n in range(num_blocks):
       if n<num_blocks-1:
          rxx=psycho(z[(n+1)*N:(n+2)*N],rate,N)
@@ -139,6 +143,8 @@ if __name__ == '__main__':
    import sys
    import os
    import scipy
+   import numpy as np 
+   
    if sys.version_info[0] < 3:
       # for Python 2
       import cPickle as pickle
@@ -159,7 +165,12 @@ if __name__ == '__main__':
    filt_lattice,filter_output,olap,filtered_spectrum,input_spectrum, norm_coeff, rate=adaptive_prefilter_quant(N=128,P=11,olap=32,q=q, filename=filename)
    print("prefiltered output written to: 'filt_quantized.wav'")
    print("and to file:", preffile)
+   rate, x = scipy.io.wavfile.read(filename)
    #scipy.io.wavfile.write(preffile, 32000,(1/q*pref[0]).astype(np.int16))
+   print("filter_output.shape=",filter_output.shape)
+   output=np.reshape(filter_output,filter_output.shape[0]*filter_output.shape[1],order='f')
+   print("output.shape=", output.shape)
+   scipy.io.wavfile.write(preffile, rate, output.astype(np.int16))
    #Writing side info to picke file:
    with open('prefilt_sidefinfo.pickle', 'wb') as sidefile: #open compressed file
       pickle.dump(filt_lattice, sidefile, protocol=-1)
