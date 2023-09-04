@@ -86,7 +86,7 @@ def adaptive_prefilter_quant(N,P,olap,q, filename):
    #filename=fileDialog()
    rate, x = scipy.io.wavfile.read(filename)
    #x=np.fromfile(open(filename),np.int16)[24:]
-   blks=x.size/N
+   blks=x.size//N
    num_blocks=np.floor(blks).astype(int)
    z=x[0:num_blocks*N]
    fil_coef=np.zeros(0).astype(float)
