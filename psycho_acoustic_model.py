@@ -34,7 +34,7 @@ class PsychoacousticModel:
         self.min_freq = minfreq                             # Minimum considered frequency
         self.max_freq = maxfreq                             # Maximum considered frequency
         self.max_freq = fs/2                                # Sanity check for Nyquist frequency
-        self.nfreqs = N/2                                   # Number of frequency points in the prior analysis (e.g. from DFT)
+        self.nfreqs = N//2                                   # Number of frequency points in the prior analysis (e.g. from DFT)
         self._LTeq = np.zeros(nfilts, dtype = np.float32)   # Initialization for the absolute threshold
 
         # Type of transformation
@@ -157,11 +157,11 @@ class PsychoacousticModel:
         step_barks = nyqbark/(nfilts-1) #from call: 24.0/63
 
         # Frequency of each FFT bin in Bark, in 1025 frequency bands (from call)
-        binbarks = self.hz2bark(np.linspace(0,(nfft/2),(nfft/2)+1)*fs/nfft)
+        binbarks = self.hz2bark(np.linspace(0,(nfft//2),(nfft//2)+1)*fs/nfft)
 
         f_bark_mid=np.zeros(nfilts)
 
-        for i in xrange(nfilts):
+        for i in range(nfilts):
           
           f_bark_mid[i] = min_bark + (i)*step_barks #from call: 0+(i)*24.0/63
 
@@ -186,7 +186,7 @@ class PsychoacousticModel:
           #lower half of FFT spectrum is assigned, looks like spreading functions already applied:
           #W[i,0:(nfft/2)+1] = 10**(np.minimum(0, np.minimum(np.divide(hif,width), np.multiply(lof,-2.5/width))))
           """
-          W[i,0:(nfft/2)+1] = (np.round(binbarks/step_barks)== i)
+          W[i,0:(nfft//2)+1] = (np.round(binbarks/step_barks)== i)
         #print "self.bark2hz(f_bark_mid)= ", self.bark2hz(f_bark_mid)
         #plt.figure()
         #plt.plot(self.bark2hz(f_bark_mid), self._LTeq)
@@ -497,7 +497,7 @@ class PsychoacousticModel:
         """
         #print "spreadingfuncmatrix= ", self.spreadingfuncmatrix
 
-        for frameindx in xrange(mX.shape[0]) :
+        for frameindx in range(mX.shape[0]) :
 
             """
             mT = np.zeros((Numsubbands))
@@ -542,7 +542,7 @@ class PsychoacousticModel:
 def psycho(x, fs, block_size):
     # Parameters
     N=block_size
-    wsz = N/2
+    wsz = N//2
     hop = wsz
     # Reshaping the signal
     x = x.reshape(len(x), 1)
@@ -553,7 +553,7 @@ def psycho(x, fs, block_size):
     w = w / sum(w)
 
     # Initialize psychoacoustic mode
-    pm = PsychoacousticModel(N=N, fs=fs, nfilts=wsz/4)
+    pm = PsychoacousticModel(N=N, fs=fs, nfilts=wsz//4)
 
     # Sine window: choose this for sine windowing for energy conservation (Parseval Theorem):
     w = np.sin(np.pi / wsz * np.arange(0.5, wsz))
@@ -565,7 +565,7 @@ def psycho(x, fs, block_size):
 
     # Perform DFT on segment
     # mX, pX = TF.TimeFrequencyDecomposition.DFT(xSeg, w, N)
-    X = np.fft.fft(xSeg * w, n=N)[:N / 2]
+    X = np.fft.fft(xSeg * w, n=N)[: N//2]
     # print "size xSeg: ", xSeg.shape
     mX = np.abs(X)
     # nX, npX = TF.TimeFrequencyDecomposition.DFT(nSeg, w, N)
